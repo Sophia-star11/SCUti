@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCUti 校园人格测试</title>
+
+  <style>
+    :root {
+      --scu-red: #b8272f;
+      --scu-red-dark: #8e1621;
+      --scu-gold: #f6c453;
+      --ink: #1f232b;
+      --muted: #6b7280;
+      --soft-muted: #8a94a6;
+      --paper: rgba(255, 255, 255, 0.9);
+      --paper-strong: rgba(255, 255, 255, 0.96);
+      --line: rgba(184, 39, 47, 0.13);
+      --shadow: 0 24px 80px rgba(95, 39, 43, 0.15);
+      --theme-from: #b8272f;
+      --theme-to: #f59e0b;
+      --theme-soft: #fff1f2;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "PingFang SC",
+        "Hiragino Sans GB",
+        "Microsoft YaHei",
+        Arial,
+        sans-serif;
+      background:
+        radial-gradient(circle at 10% 8%, rgba(184, 39, 47, 0.20), transparent 26%),
+        radial-gradient(circle at 92% 10%, rgba(246, 196, 83, 0.22), transparent 24%),
+        radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.10), transparent 34%),
+        linear-gradient(135deg, #fff7ed 0%, #fffaf4 46%, #f7fbff 100%);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: -1;
+      filter: blur(6px);
+    }
+
+    body::before {
+      width: 300px;
+      height: 300px;
+      left: -145px;
+      bottom: 8%;
+      background: rgba(184, 39, 47, 0.08);
+    }
+
+    body::after {
+      width: 260px;
+      height: 260px;
+      right: -130px;
+      top: 34%;
+      background: rgba(245, 158, 11, 0.10);
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .container {
+      width: min(100% - 32px, 780px);
+      margin: 0 auto;
+      padding: 44px 0;
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn 0.42s ease both;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      background: var(--paper);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.70), transparent 36%),
+        radial-gradient(circle at 50% 0%, rgba(184, 39, 47, 0.06), transparent 44%);
+    }
+
+    .card-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .start-card,
+    .question-card,
+    .result-card {
+      padding: clamp(26px, 5vw, 46px);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    .hero {
+      text-align: center;
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      max-width: 100%;
+      padding: 8px 16px 8px 10px;
+      border: 1px solid rgba(184, 39, 47, 0.16);
+      border-radius: 999px;
+      color: var(--scu-red-dark);
+      background: rgba(255, 255, 255, 0.72);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      box-shadow: 0 10px 26px rgba(184, 39, 47, 0.10);
+      white-space: nowrap;
+    }
+
+    .brand-logo {
+      width: 30px;
+      height: 30px;
+      display: block;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      object-fit: contain;
+      background: #fff;
+      border: 1px solid rgba(184, 39, 47, 0.14);
+      padding: 2px;
+    }
+
+    .title {
+      margin-top: 22px;
+      color: #16181d;
+      font-size: clamp(36px, 8.5vw, 60px);
+      line-height: 1.08;
+      letter-spacing: -0.045em;
+      font-weight: 900;
+    }
+
+    .title-line {
+      display: block;
+    }
+
+    .title-highlight {
+      display: inline-block;
+      padding: 0 6px;
+      background: linear-gradient(135deg, var(--scu-red) 0%, #f97316 82%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+
+    .lead {
+      max-width: 560px;
+      margin: 18px auto 0;
+      color: #5b6473;
+      font-size: 17px;
+      line-height: 1.9;
+    }
+
+    .mini-tags {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin: 30px 0 32px;
+    }
+
+    .mini-tag {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 10px;
+      border: 1px solid rgba(184, 39, 47, 0.12);
+      border-radius: 999px;
+      color: #4b5563;
+      background: rgba(255, 255, 255, 0.72);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.25;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(95, 39, 43, 0.06);
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 900;
+      transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        background 0.22s ease;
+    }
+
+    .primary-btn {
+      min-width: 164px;
+      padding: 15px 34px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--scu-red), #f97316);
+      box-shadow: 0 16px 32px rgba(184, 39, 47, 0.24);
+    }
+
+    .secondary-btn {
+      min-width: 132px;
+      padding: 13px 28px;
+      color: var(--theme-from);
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(184, 39, 47, 0.16);
+    }
+
+    .primary-btn:hover,
+    .secondary-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .primary-btn:active,
+    .secondary-btn:active,
+    .option-card:active {
+      transform: translateY(0) scale(0.99);
+    }
+
+    .footnote {
+      margin-top: 18px;
+      color: #7c8493;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .progress-wrap {
+      margin-bottom: 28px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .question-index {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      color: var(--scu-red-dark);
+      background: rgba(184, 39, 47, 0.08);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(107, 114, 128, 0.13);
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--scu-red), #f59e0b);
+      transition: width 0.3s ease;
+    }
+
+    .question-text {
+      margin-bottom: 24px;
+      color: #191d26;
+      font-size: clamp(22px, 5vw, 30px);
+      line-height: 1.42;
+      letter-spacing: -0.02em;
+      font-weight: 900;
+      text-wrap: balance;
+    }
+
+    .options {
+      display: grid;
+      gap: 14px;
+    }
+
+    .option-card {
+      width: 100%;
+      appearance: none;
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      align-items: start;
+      gap: 13px;
+      min-height: 68px;
+      padding: 17px 18px;
+      border: 1px solid rgba(107, 114, 128, 0.16);
+      border-radius: 20px;
+      color: #262a33;
+      background: rgba(255, 255, 255, 0.82);
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(31, 41, 55, 0.05);
+      transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .option-card:hover,
+    .option-card:focus-visible {
+      outline: none;
+      border-color: rgba(184, 39, 47, 0.48);
+      background: #fff;
+      box-shadow: 0 16px 36px rgba(31, 41, 55, 0.10);
+      transform: translateX(5px);
+    }
+
+    .option-letter {
+      width: 32px;
+      height: 32px;
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      margin-top: 1px;
+      border-radius: 11px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--scu-red), #f97316);
+      font-weight: 900;
+      line-height: 1;
+      box-shadow: 0 8px 18px rgba(184, 39, 47, 0.18);
+    }
+
+    .option-text {
+      display: block;
+      color: #2f3440;
+      font-size: 16px;
+      line-height: 1.72;
+      word-break: break-word;
+    }
+
+    .result-card {
+      text-align: center;
+    }
+
+    .result-card::after {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 172px;
+      background: linear-gradient(135deg, var(--theme-from), var(--theme-to));
+      opacity: 0.13;
+      pointer-events: none;
+    }
+
+    .result-inner {
+      position: relative;
+      z-index: 2;
+    }
+
+    .result-kicker {
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .result-image-wrap {
+      width: min(76vw, 320px);
+      margin: 22px auto 16px;
+      padding: 10px;
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.58));
+      box-shadow: 0 22px 50px rgba(31, 41, 55, 0.16);
+    }
+
+    .result-image {
+      width: 100%;
+      display: block;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 25px;
+      background: var(--theme-soft);
+    }
+
+    .result-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      max-width: 100%;
+      margin: 8px auto 12px;
+      padding: 8px 17px;
+      border: 1px solid rgba(255, 255, 255, 0.82);
+      border-radius: 999px;
+      color: var(--theme-from);
+      background: var(--theme-soft);
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .result-name {
+      margin-bottom: 16px;
+      color: #15171c;
+      font-size: clamp(34px, 8vw, 50px);
+      line-height: 1.12;
+      letter-spacing: -0.04em;
+      font-weight: 950;
+    }
+
+    .result-desc {
+      max-width: 620px;
+      margin: 0 auto 24px;
+      padding: 20px;
+      border: 1px solid rgba(107, 114, 128, 0.12);
+      border-radius: 22px;
+      color: #4b5563;
+      background: rgba(255, 255, 255, 0.76);
+      text-align: left;
+      font-size: 17px;
+      line-height: 1.95;
+    }
+
+    .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+
+    .ghost-btn {
+      min-width: 116px;
+      padding: 11px 18px;
+      color: #5b6473;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(107, 114, 128, 0.18);
+      appearance: none;
+      cursor: pointer;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 900;
+      transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        background 0.22s ease,
+        opacity 0.22s ease;
+    }
+
+    .ghost-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 12px 24px rgba(31, 41, 55, 0.08);
+    }
+
+    .ghost-btn:active {
+      transform: translateY(0) scale(0.99);
+    }
+
+    .ghost-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .question-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(107, 114, 128, 0.12);
+    }
+
+    .question-tip {
+      color: var(--soft-muted);
+      font-size: 13px;
+      line-height: 1.6;
+      text-align: right;
+    }
+
+    .option-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(184, 39, 47, 0.08), transparent 45%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .option-card:hover::after,
+    .option-card:focus-visible::after {
+      opacity: 1;
+    }
+
+    @media (max-width: 620px) {
+      .container {
+        width: min(100% - 24px, 780px);
+        padding: 24px 0;
+      }
+
+      .start-card,
+      .question-card,
+      .result-card {
+        padding: 24px 18px;
+        border-radius: 26px;
+      }
+
+      .brand-pill {
+        gap: 8px;
+        padding: 7px 13px 7px 8px;
+        font-size: 13px;
+      }
+
+      .brand-logo {
+        width: 28px;
+        height: 28px;
+      }
+
+      .lead {
+        font-size: 15.5px;
+        line-height: 1.85;
+      }
+
+      .mini-tags {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        margin: 26px 0 30px;
+      }
+
+      .question-text {
+        font-size: 23px;
+        line-height: 1.45;
+      }
+
+      .option-card {
+        grid-template-columns: 32px 1fr;
+        gap: 11px;
+        padding: 15px;
+        border-radius: 18px;
+      }
+
+      .option-letter {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+      }
+
+      .option-text {
+        font-size: 15.5px;
+        line-height: 1.75;
+      }
+
+      .result-desc {
+        font-size: 15.8px;
+        line-height: 1.92;
+        padding: 18px;
+      }
+
+      .question-actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .question-tip {
+        text-align: left;
+      }
+
+      .ghost-btn {
+        width: 100%;
+      }
+
+    }
+
+    @media (max-width: 380px) {
+      .container {
+        width: min(100% - 18px, 780px);
+      }
+
+      .start-card,
+      .question-card,
+      .result-card {
+        padding: 22px 14px;
+      }
+
+      .mini-tags {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .primary-btn,
+      .secondary-btn,
+      .ghost-btn {
+        width: 100%;
+      }
+
+      .result-actions {
+        gap: 10px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <!-- 首页 -->
+    <section id="startPage" class="page active" aria-labelledby="startTitle">
+      <div class="card start-card">
+        <div class="card-content hero">
+          <div class="brand-pill">
+            <img
+              class="brand-logo"
+              src="images/scu-logo.png"
+              alt="四川大学校徽"
+            />
+            <span>青春川大 · SCUti</span>
+          </div>
+
+          <h1 id="startTitle" class="title">
+            <span class="title-line">你的校园版</span>
+            <span class="title-line">
+              <span class="title-highlight">专属人格</span>是什么？
+            </span>
+          </h1>
+
+          <p class="lead">
+            16 道生活化选择题，从上班鸭、校园猫咪到不高山，<br />
+            测出更像你的川大校园人格。
+          </p>
+
+          <div class="mini-tags" aria-label="人格关键词">
+            <span class="mini-tag">稳定靠谱</span>
+            <span class="mini-tag">慵懒佛系</span>
+            <span class="mini-tag">极致浪漫</span>
+            <span class="mini-tag">奔赴热爱</span>
+            <span class="mini-tag">实干担当</span>
+            <span class="mini-tag">沉静独立</span>
+            <span class="mini-tag">热血嘴硬</span>
+            <span class="mini-tag">松弛通透</span>
+          </div>
+
+          <button id="startBtn" type="button" class="primary-btn">
+            开始测试
+          </button>
+
+          <p class="footnote">
+            选项没有标准答案，凭第一反应选择即可。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 答题页 -->
+    <section id="questionPage" class="page" aria-labelledby="questionText">
+      <div class="card question-card">
+        <div class="card-content">
+          <div class="progress-wrap">
+            <div class="progress-meta">
+              <span class="question-index">
+                题目 <span id="currentNum">1</span>/<span id="totalNum">16</span>
+              </span>
+              <span id="progressPercent">6%</span>
+            </div>
+
+            <div
+              class="progress-track"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="6"
+            >
+              <div
+                id="progressBar"
+                class="progress-bar"
+                style="width: 6%"
+              ></div>
+            </div>
+          </div>
+
+          <h2 id="questionText" class="question-text"></h2>
+          <div id="optionsContainer" class="options"></div>
+
+          <div class="question-actions">
+            <button id="prevBtn" type="button" class="ghost-btn">
+              上一题
+            </button>
+            <p class="question-tip">
+              选项没有对错，按第一反应作答即可。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 结果页 -->
+    <section id="resultPage" class="page" aria-labelledby="resultName">
+      <div id="resultCard" class="card result-card">
+        <div class="result-inner">
+          <p class="result-kicker">你的 SCUti 人格是</p>
+
+          <div class="result-image-wrap">
+            <img id="resultImage" class="result-image" src="" alt="" />
+          </div>
+
+          <div id="resultTag" class="result-tag"></div>
+          <h3 id="resultName" class="result-name"></h3>
+          <p id="resultDesc" class="result-desc"></p>
+
+          <div class="result-actions">
+            <button id="editLastBtn" type="button" class="secondary-btn">
+              修改上一题
+            </button>
+            <button id="restartBtn" type="button" class="primary-btn">
+              重新测试
+            </button>
+            <button id="backHomeBtn" type="button" class="secondary-btn">
+              返回首页
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ====================== SCUti 配置区 ======================
+    const PERSONALITIES = [
+      {
+        id: 0,
+        name: "上班鸭",
+        tag: "稳定靠谱 · 治愈顶流",
+        desc: "你是稳定靠谱的“治愈顶流”，就像明远湖常驻明星小鸭子，每天来去准时，清理水华，不但实实完成工作，还有自带的可爱从容气场，让每个路人会心一笑，你在安稳的节奏里，把生活过成光。",
+        theme: { from: "#d97706", to: "#facc15", soft: "#fff7d6" },
+        image: "images/shangbanya.png"
+      },
+      {
+        id: 1,
+        name: "校园猫咪",
+        tag: "慵懒佛系 · 外柔内刚",
+        desc: "你表面慵懒佛系，实际外柔内刚，就像学校的常驻小猫咪，可以在太阳下打一整天盹，也可以适应风雨顽强生活，你的自立自强，随遇而安，是喵星人特有的生存智慧。",
+        theme: { from: "#ea580c", to: "#fdba74", soft: "#ffedd5" },
+        image: "images/xiaoyuanmaomi.png"
+      },
+      {
+        id: 2,
+        name: "蓝花楹",
+        tag: "极致浪漫 · 悄悄蓄力",
+        desc: "你有极致浪漫的灵魂，默默扎根的定力。就像春夏之交突然占领街道的蓝花楹，用一年漫长的扎根蓄力，换一个蓝紫色的梦幻“雨季”。你在无人注目处努力生长，自有清风散漫幽香。",
+        theme: { from: "#7c3aed", to: "#93c5fd", soft: "#ede9fe" },
+        image: "images/lanhuaying.png"
+      },
+      {
+        id: 3,
+        name: "白石桥",
+        tag: "理想主义 · 奔赴热爱",
+        desc: "你是用青春奔赴热爱的理想家，就像无数青年艺术家扎堆驻足的白石桥，桥上荡漾着青春的声浪，洞里涂鸦着彩色的时光。世界再喧嚣，你也始终心怀滚烫，在平凡的日常里，坚守不凡的理想。",
+        theme: { from: "#2563eb", to: "#f43f5e", soft: "#e0f2fe" },
+        image: "images/baishiqiao.png"
+      },
+      {
+        id: 4,
+        name: "小白龙",
+        tag: "精力满满 · 实干担当",
+        desc: "你是让人佩服的高精力实干家，就像靠谱的“校园穿梭机”小白龙，每天热情似火地穿梭在校园里，成为满课人的救命神器。你的热情与真诚，元气与行动力，是让身边人安心的存在。",
+        theme: { from: "#dc2626", to: "#fb923c", soft: "#fee2e2" },
+        image: "images/xiaobailong.png"
+      },
+      {
+        id: 5,
+        name: "自动贩卖机",
+        tag: "高冷独立 · 贴心补给",
+        desc: "你是沉静独立，温柔细腻，就像安静立于角落的自动贩卖机，从不在花花绿绿的食堂前刷存在感，却在上课的同学需要时如救星般出现。你把温暖藏在冷静克制的外表下，不声张，却足够治愈。",
+        theme: { from: "#0f766e", to: "#38bdf8", soft: "#ccfbf1" },
+        image: "images/zidongfanmaiji.png"
+      },
+      {
+        id: 6,
+        name: "早八人",
+        tag: "热血冲劲 · 乐观嘴硬",
+        desc: "你是乐观嘴硬的热血少年，就像每天上早八那样，踩着时间奔赴课堂，带着抱怨，却从不懈怠。在兵荒马乱的日常里自我调整，真实、倔强，永远积极向上，早八人都是人上人！",
+        theme: { from: "#e11d48", to: "#f59e0b", soft: "#ffe4e6" },
+        image: "images/zaobaren.png"
+      },
+      {
+        id: 7,
+        name: "不高山",
+        tag: "大智若愚 · 松弛通透",
+        desc: "你是松弛通透的智者，就像不高山，名为“不高”，却装得下每个人的舒展和眺望，用一片绿意接纳所有疲惫与欢喜。你低调藏拙，温和有力，心里永远有一片宁静自洽的天地。",
+        theme: { from: "#15803d", to: "#86efac", soft: "#dcfce7" },
+        image: "images/bugaoshan.png"
+      }
+    ];
+
+    /*
+      计分说明：
+      1. 每个选项只对应 1 种人格，映射清晰。
+      2. 16 题 × 4 个选项 = 64 个得分点。
+      3. 如果后续继续调整题目，建议尽量让 8 种人格得分点数量接近。
+    */
+    const QUESTIONS = [
+      {
+        text: "一天没课，你最想打开的状态是？",
+        options: [
+          { text: "先把待办事项安排好，心里踏实再逐一执行", score: 0 },
+          { text: "找个阳光刚好的角落放空，能躺就绝不硬撑", score: 1 },
+          { text: "投入抱有热爱与兴趣的事业，哪怕累也觉得值得", score: 3 },
+          { text: "叫上朋友一起出去玩，把空档用得满满当当", score: 4 }
+        ]
+      },
+      {
+        text: "接到一个临时任务，你通常会？",
+        options: [
+          { text: "先稳定情绪，按自己的节奏进入状态", score: 1 },
+          { text: "在时间紧急的情况下注重工作的质感与创意", score: 2 },
+          { text: "直接开干，边推进边解决问题", score: 4 },
+          { text: "拆解需求与目标，把控关键节点", score: 5 }
+        ]
+      },
+      {
+        text: "朋友说想在校园里找点灵感，你会？",
+        options: [
+          { text: "带 TA 看花和光影，慢慢把心情调亮", score: 2 },
+          { text: "拉 TA 去白石桥听歌看涂鸦，激发热爱与共鸣", score: 3 },
+          { text: "提供必要的务实的帮助，不多问但一直在场", score: 5 },
+          { text: "一边跟TA分享生活的烦恼与趣事，一边拉着TA冲去找新鲜事", score: 6 }
+        ]
+      },
+      {
+        text: "面对连续好几天每天都有 ddl，你更倾向？",
+        options: [
+          { text: "告诉自己这是为热爱打磨，熬也要熬出作品", score: 3 },
+          { text: "做一个高强度执行清单，马上推进", score: 4 },
+          { text: "嘴上喊着受不了了，还是在最后一刻完成了工作", score: 6 },
+          { text: "把压力放平，一项项处理，不被焦虑牵着跑", score: 7 }
+        ]
+      },
+      {
+        text: "朋友突然说“陪我去办个急事”，你的第一反应是？",
+        options: [
+          { text: "反应快速，立刻出发，马上安排路线", score: 4 },
+          { text: "不声张地带上可能用到的东西", score: 5 },
+          { text: "先让 TA 别慌，慢慢把事理顺", score: 7 },
+          { text: "确认时间、地点、材料，稳稳陪 TA 办完", score: 0 }
+        ]
+      },
+      {
+        text: "在宿舍时，你常常是？",
+        options: [
+          { text: "不太抢话，但别人需要时总能递上帮助", score: 5 },
+          { text: "气氛冷了就开两句玩笑，让氛围更热切", score: 6 },
+          { text: "主动维护秩序，让公共空间舒服可靠", score: 0 },
+          { text: "保持自己的舒适边界，安静但不疏离", score: 1 }
+        ]
+      },
+      {
+        text: "参加集体活动时，你更像哪一种？",
+        options: [
+          { text: "负责把大家情绪点燃，让活动热闹到底", score: 6 },
+          { text: "默默照顾所有人的感受，稳定全场节奏", score: 7 },
+          { text: "找到最舒服的位置参与，不勉强自己营业", score: 1 },
+          { text: "负责记录活动瞬间，以幕后工作为集体贡献", score: 2 }
+        ]
+      },
+      {
+        text: "如果要做一篇公众号推文，你更偏向？",
+        options: [
+          { text: "以内容内核优先，挖掘普通日常里的通透与共鸣", score: 7 },
+          { text: "注重高效执行，先搭框架、定节奏，保证准时上线", score: 0 },
+          { text: "追求画面、标题和文案的质感与氛围感", score: 2 },
+          { text: "强调价值意义，让作品有热度也有立场", score: 3 }
+        ]
+      },
+      {
+        text: "路过明远湖边，你最容易注意到？",
+        options: [
+          { text: "这里是否整洁有序", score: 0 },
+          { text: "光影、花色和风吹过来的瞬间", score: 2 },
+          { text: "这里能否休息或是练歌晨读", score: 5 },
+          { text: "能坐下来接住疲惫的那片安宁", score: 7 }
+        ]
+      },
+      {
+        text: "面对别人对你的评价，你通常会？",
+        options: [
+          { text: "听听就好，日子还是按自己的舒服方式过", score: 1 },
+          { text: "坚定自己的想法与理想，不为所有声音改变", score: 3 },
+          { text: "表面嘴硬，转头偷偷改变自己", score: 6 },
+          { text: "理性复盘，有用的吸收，没用的放下", score: 0 }
+        ]
+      },
+      {
+        text: "选一门课或一个项目时，你最看重？",
+        options: [
+          { text: "它能不能激发想象和表达欲", score: 2 },
+          { text: "它能不能马上实践、快速得到反馈", score: 4 },
+          { text: "它是否能让自己长期发展成长", score: 7 },
+          { text: "工作量和节奏是否适合自己现在的生活", score: 1 }
+        ]
+      },
+      {
+        text: "朋友情绪低落来找你，你会怎么做？",
+        options: [
+          { text: "用真诚的话点燃 TA，提醒 TA 别放弃对生活的热爱", score: 3 },
+          { text: "默默给TA买杯喝的，陪在旁边不多打扰", score: 5 },
+          { text: "帮 TA 梳理问题，拆成可执行的小步骤", score: 0 },
+          { text: "用温和的语言和小惊喜把气氛慢慢变好", score: 2 }
+        ]
+      },
+      {
+        text: "突然多出一个下午，你更可能？",
+        options: [
+          { text: "立刻安排运动、办事或见人，能量满格", score: 4 },
+          { text: "先释放一会情绪和压力，再冲去做想做的事", score: 6 },
+          { text: "慢悠悠睡醒、晒太阳，恢复自己的电量", score: 1 },
+          { text: "去做一直想做但没开始的热爱项目", score: 3 }
+        ]
+      },
+      {
+        text: "你更喜欢怎样被需要？",
+        options: [
+          { text: "不必站在中心，但关键时刻能派上用场", score: 5 },
+          { text: "像一处可靠的港湾，让别人能放松停靠", score: 7 },
+          { text: "创造美好与价值，当“发光的人”，让别人感到生活值得", score: 2 },
+          { text: "被信任去冲锋和执行，把事情真正落地", score: 4 }
+        ]
+      },
+      {
+        text: "期末周你最真实的状态是？",
+        options: [
+          { text: "一边喊累一边熬，ddl 前爆发惊人战力", score: 6 },
+          { text: "按科学的复习表稳步推进，尽量不让自己失控", score: 0 },
+          { text: "为追求的目标拼一把，越到最后越坚定", score: 3 },
+          { text: "默默做好准备，独自消化压力", score: 5 }
+        ]
+      },
+      {
+        text: "当团队出现分歧、气氛紧张时，你会怎么做？",
+        options: [
+          { text: "先安抚情绪，让大家冷静下来再沟通", score: 7 },
+          { text: "保持旁观，等别人主导，不主动卷入争执", score: 1 },
+          { text: "快速梳理矛盾点，给出可行方案推动共识", score: 4 },
+          { text: "活跃气氛，用轻松方式缓和尴尬", score: 6 }
+        ]
+      }
+    ];
+    // =========================================================
+
+    let currentQuestion = 0;
+    let totalScores = new Array(PERSONALITIES.length).fill(0);
+    let answerHistory = [];
+
+    const questionPage = document.getElementById("questionPage");
+    const resultCard = document.getElementById("resultCard");
+
+    const startBtn = document.getElementById("startBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const editLastBtn = document.getElementById("editLastBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const backHomeBtn = document.getElementById("backHomeBtn");
+
+    const currentNumEl = document.getElementById("currentNum");
+    const totalNumEl = document.getElementById("totalNum");
+    const progressPercentEl = document.getElementById("progressPercent");
+    const progressBarEl = document.getElementById("progressBar");
+    const progressTrackEl = document.querySelector(".progress-track");
+
+    const questionTextEl = document.getElementById("questionText");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+
+    const resultImageEl = document.getElementById("resultImage");
+    const resultTagEl = document.getElementById("resultTag");
+    const resultNameEl = document.getElementById("resultName");
+    const resultDescEl = document.getElementById("resultDesc");
+
+    totalNumEl.textContent = QUESTIONS.length;
+
+    function switchPage(pageId) {
+      document
+        .querySelectorAll(".page")
+        .forEach(page => page.classList.remove("active"));
+
+      document.getElementById(pageId).classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function updatePrevButton() {
+      if (!prevBtn) {
+        return;
+      }
+
+      prevBtn.disabled = currentQuestion === 0 || answerHistory.length === 0;
+    }
+
+    function renderQuestion() {
+      const q = QUESTIONS[currentQuestion];
+      const percent = Math.round(((currentQuestion + 1) / QUESTIONS.length) * 100);
+
+      currentNumEl.textContent = currentQuestion + 1;
+      progressPercentEl.textContent = `${percent}%`;
+      progressBarEl.style.width = `${percent}%`;
+      progressTrackEl.setAttribute("aria-valuenow", String(percent));
+
+      questionTextEl.textContent = q.text;
+      optionsContainerEl.innerHTML = "";
+
+      q.options.forEach((opt, index) => {
+        const btn = document.createElement("button");
+        const letter = String.fromCharCode(65 + index);
+
+        btn.type = "button";
+        btn.className = "option-card";
+        btn.setAttribute("aria-label", `${letter}. ${opt.text}`);
+
+        btn.innerHTML = `
+          <span class="option-letter">${letter}</span>
+          <span class="option-text">${opt.text}</span>
+        `;
+
+        btn.addEventListener("click", () => selectAnswer(opt.score));
+        optionsContainerEl.appendChild(btn);
+      });
+
+      updatePrevButton();
+    }
+
+    function selectAnswer(scoreId) {
+      totalScores[scoreId] += 1;
+      answerHistory.push(scoreId);
+      currentQuestion += 1;
+
+      if (currentQuestion >= QUESTIONS.length) {
+        showResult();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function goBackOneQuestion() {
+      if (answerHistory.length === 0) {
+        return;
+      }
+
+      const lastScoreId = answerHistory.pop();
+      totalScores[lastScoreId] = Math.max(0, totalScores[lastScoreId] - 1);
+      currentQuestion = Math.max(0, currentQuestion - 1);
+
+      renderQuestion();
+      switchPage("questionPage");
+    }
+
+    function resolveTie(candidates) {
+      // 用答题路径生成稳定散列，避免平分时总是偏向数组靠前的人格。
+      const seed = answerHistory.reduce((acc, id, index) => {
+        return (acc * 31 + (id + 1) * (index + 7)) % 1000003;
+      }, 17);
+
+      return candidates[seed % candidates.length];
+    }
+
+    function getResultIndex() {
+      const maxScore = Math.max(...totalScores);
+
+      const candidates = totalScores
+        .map((score, index) => ({ score, index }))
+        .filter(item => item.score === maxScore)
+        .map(item => item.index);
+
+      return candidates.length === 1 ? candidates[0] : resolveTie(candidates);
+    }
+
+    function applyTheme(result) {
+      resultCard.style.setProperty("--theme-from", result.theme.from);
+      resultCard.style.setProperty("--theme-to", result.theme.to);
+      resultCard.style.setProperty("--theme-soft", result.theme.soft);
+    }
+
+    function showResult() {
+      const resultIndex = getResultIndex();
+      const result = PERSONALITIES[resultIndex];
+
+      applyTheme(result);
+
+      resultImageEl.src = result.image;
+      resultImageEl.alt = `${result.name}人格形象图`;
+      resultImageEl.onerror = () => {
+        resultImageEl.alt = `${result.name}人格形象图加载失败，请检查图片路径：${result.image}`;
+        console.warn(`图片加载失败：${result.image}`);
+      };
+
+      resultTagEl.textContent = result.tag;
+      resultNameEl.textContent = result.name;
+      resultDescEl.textContent = result.desc;
+
+      switchPage("resultPage");
+    }
+
+    function resetTest() {
+      currentQuestion = 0;
+      totalScores = new Array(PERSONALITIES.length).fill(0);
+      answerHistory = [];
+      renderQuestion();
+      switchPage("questionPage");
+    }
+
+    function backHome() {
+      currentQuestion = 0;
+      totalScores = new Array(PERSONALITIES.length).fill(0);
+      answerHistory = [];
+      updatePrevButton();
+      switchPage("startPage");
+    }
+
+    function validateQuestionDistribution() {
+      const counts = new Array(PERSONALITIES.length).fill(0);
+
+      QUESTIONS.forEach(q => {
+        q.options.forEach(opt => {
+          counts[opt.score] += 1;
+        });
+      });
+
+      console.info("SCUti 人格得分点分布：", counts);
+    }
+
+    startBtn.addEventListener("click", () => {
+      currentQuestion = 0;
+      totalScores = new Array(PERSONALITIES.length).fill(0);
+      answerHistory = [];
+      renderQuestion();
+      switchPage("questionPage");
+    });
+
+    prevBtn.addEventListener("click", goBackOneQuestion);
+    editLastBtn.addEventListener("click", goBackOneQuestion);
+    restartBtn.addEventListener("click", resetTest);
+    backHomeBtn.addEventListener("click", backHome);
+
+    validateQuestionDistribution();
+    updatePrevButton();
+  </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"7939e04a4baf43c8b86a560f74aac60e","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"45c2bf8136a245cd97f1c2e9a96c0730","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
